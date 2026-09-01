@@ -2,7 +2,7 @@
 
 *Explica cuáles son las partes básicas de una aplicación móvil (interfaz, lógica, eventos, navegación, datos), siguiendo el mismo procedimiento del ejercicio resuelto por el docente. Acompaña tu explicación con un esquema o diagrama propio.*
 
-Para este ejercicio, analizaremos la aplicación **Spotify** (app móvil de música en streaming):
+Para este ejercicio, analizaremos la aplicación *Spotify* (app móvil de música en streaming):
 
 #align(center)[
   #rect(width: 85%, inset: 10pt, radius: 5pt, fill: rgb("#f5f5f5"))[
