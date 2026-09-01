@@ -1,0 +1,4 @@
+- El desarrollo de aplicaciones móviles ha transformado la manera en que los usuarios interactúan con la tecnología, convirtiéndose en una pieza fundamental para la resolución de problemas cotidianos mediante plataformas adaptables y ubicuas.
+- Existen diversas arquitecturas para el desarrollo de software móvil (nativas, web e híbridas), cada una con ventajas específicas que deben evaluarse cuidadosamente dependiendo de los requisitos técnicos, de rendimiento y de presupuesto del proyecto.
+- La comprensión de la estructura básica de una app, que incluye la interfaz, la lógica, los eventos, la navegación y los datos, es indispensable para diseñar soluciones escalables, consistentes y centradas en el usuario.
+- A través del análisis de aplicaciones populares como WhatsApp o Spotify, hemos podido evidenciar cómo estos componentes estructurales trabajan en conjunto de forma armoniosa para proporcionar una experiencia de usuario fluida y eficiente.
