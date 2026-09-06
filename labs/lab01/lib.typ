@@ -18,7 +18,7 @@
   year: none,
   presentation_date: none,
   sem_code: none,
-  presentation_hour: "00:00",
+  presentation_hour: "11:59:00",
   ..custom_vars,
   body,
 ) = {
@@ -34,7 +34,7 @@
   let resolved-presentation-date = if presentation_date != none {
     presentation_date
   } else {
-    gen-time.display("22/06/2026")
+    gen-time.display("[day]/[month]/[year]")
   }
   let resolved-sem-code = if sem_code != none {
     sem_code
@@ -53,15 +53,9 @@
   }
 
   // Layout
-  set text(
-    font: "New Computer Modern",
-    size: 11pt,
-    lang: "es",
-  )
-  set par(justify: true)
+  set text(font: "Lato")
   show heading.where(level: 1): set text(size: 10pt)
   show heading.where(level: 2): set text(size: 9pt)
-  show math.equation: set text(font: "New Computer Modern Math")
   set list(indent: 1em, marker: "-")
   set enum(numbering: "1.")
   set image(width: 90%)

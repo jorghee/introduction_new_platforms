@@ -21,11 +21,7 @@
           inherit system;
           config.allowUnfree = true;
         };
-        fonts = with pkgs; [ 
-          lato 
-          libertine
-          newcm
-        ];
+        fonts = with pkgs; [ lato ];
       in
       {
         devShells.default = pkgs.mkShell {
