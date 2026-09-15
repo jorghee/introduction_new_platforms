@@ -7,13 +7,13 @@ Para mantener un proyecto ordenado y seguir buenas prácticas de la arquitectura
 Dentro de `AccountManager.kt`, creamos la función `guardarCuenta()`, la cual recibe el Contexto para acceder al almacenamiento y escribe el binomio usuario-contraseña concatenado con un delimitador.
 
 #figure(
-  image("../../img/report/ej2_codigo.png", width: 80%),
+  image("../../img/report/ej2_codigo.png", width: 90%),
   caption: [Función guardarCuenta con MODE_APPEND],
 )
 
 Luego, en `RegistroScreen.kt`, recuperamos el contexto de Compose mediante `LocalContext.current` y lo utilizamos para llamar a nuestra función de guardado antes de navegar hacia atrás (`navController.popBackStack()`). Comprobamos que esto soluciona el requerimiento sin acoplar la lógica de escritura directamente en la vista.
 
 #figure(
-  image("../../img/report/ej2_ejecucion.png", width: 30%),
+  image("../../img/report/ej2_ejecucion.png", width: 90%),
   caption: [Toast confirmando registro exitoso],
 )

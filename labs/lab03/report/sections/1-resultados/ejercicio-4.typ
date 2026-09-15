@@ -7,11 +7,11 @@ Lo resolvimos agregando una validación reactiva empleando los estados gestionad
 Si la evaluación resulta verdadera, interrumpimos el flujo con un `return@Button` y asignamos el mensaje "Por favor, llene todos los campos." a la variable mutable de estado `mensajeError`, lo que hace que Compose re-dibuje la interfaz instantáneamente mostrando la advertencia de color rojo al usuario sin hacer crashear la aplicación.
 
 #figure(
-  image("../../img/report/ej4_codigo.png", width: 80%),
+  image("../../img/report/ej4_codigo.png", width: 90%),
   caption: [Retorno anticipado ante campos vacíos],
 )
 
 #figure(
-  image("../../img/report/ej4_ejecucion.png", width: 30%),
+  image("../../img/report/ej4_ejecucion.png", width: 90%),
   caption: [Mensaje de error reactivo en interfaz],
 )

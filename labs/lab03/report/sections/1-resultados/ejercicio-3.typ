@@ -7,13 +7,13 @@ Para ello, implementamos la función `obtenerCuentasRegistradas()` en nuestro `A
 Posteriormente, en la función de control principal `validarCuenta()`, verificamos si las credenciales coinciden iterando sobre las tuplas obtenidas.
 
 #figure(
-  image("../../img/report/ej3_codigo.png", width: 80%),
+  image("../../img/report/ej3_codigo.png", width: 90%),
   caption: [Función validarCuenta contrastando credenciales],
 )
 
 En la capa de presentación (`LoginScreen.kt`), dependiendo de la respuesta booleana devuelta por el manager, enrutamos al usuario hacia `HomeScreen` o pintamos el texto de error "Cuenta no encontrada o credenciales incorrectas".
 
 #figure(
-  image("../../img/report/ej3_ejecucion.png", width: 30%),
+  image("../../img/report/ej3_ejecucion.png", width: 90%),
   caption: [Transición erronea tras iniciar sesión validando con archivo],
 )
