@@ -6,8 +6,12 @@ Lo resolvimos agregando una validación reactiva empleando los estados gestionad
 
 Si la evaluación resulta verdadera, interrumpimos el flujo con un `return@Button` y asignamos el mensaje "Por favor, llene todos los campos." a la variable mutable de estado `mensajeError`, lo que hace que Compose re-dibuje la interfaz instantáneamente mostrando la advertencia de color rojo al usuario sin hacer crashear la aplicación.
 
-**[CAPTURA REQUERIDA - Código]**
-Capturar el archivo `LoginScreen.kt` o `RegistroScreen.kt`, mostrando el bloque `onClick` del botón principal donde se evidencia la validación `isBlank()` y el retorno anticipado.
+#figure(
+  image("../../img/report/ej4_codigo.png", width: 80%),
+  caption: [Retorno anticipado ante campos vacíos],
+)
 
-**[CAPTURA REQUERIDA - Ejecución]**
-Ejecutar la aplicación en el emulador, dejar los campos de texto completamente vacíos, presionar el botón "Ingresar" y tomar una captura evidenciando el mensaje de error de validación mostrado en pantalla.
+#figure(
+  image("../../img/report/ej4_ejecucion.png", width: 30%),
+  caption: [Mensaje de error reactivo en interfaz],
+)

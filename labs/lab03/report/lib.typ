@@ -53,7 +53,7 @@
   }
 
   // Layout
-  set text(font: "Lato")
+  set text(font: ("Calibri", "Arial", "sans-serif"))
   show heading.where(level: 1): set text(size: 10pt)
   show heading.where(level: 2): set text(size: 9pt)
   set list(indent: 1em, marker: "-")
