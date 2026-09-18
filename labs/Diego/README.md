@@ -11,10 +11,13 @@ El desarrollo se enfoca en la aplicación de las mejores prácticas de la progra
 ## Tabla de Contenidos
 
 - [1. Contexto y Requerimientos del Negocio](#1-contexto-y-requerimientos-del-negocio)
+  - [Mockup de Requerimientos Inicial](#mockup-de-requerimientos-inicial)
 - [2. Evolución y Mejora en la Estructuración de la Interfaz (UI Layout)](#2-evolución-y-mejora-en-la-estructuración-de-la-interfaz-ui-layout)
   - [Estructura Anterior (Propuesta 1: Maquetación Plana e Imperativa)](#estructura-anterior-propuesta-1-maquetación-plana-e-imperativa)
   - [Estructura Implementada (Propuesta 2: Jerarquía Modular y Declarativa)](#estructura-implementada-propuesta-2-jerarquía-modular-y-declarativa)
+  - [Comparativa Visual de Propuestas (Mockups)](#comparativa-visual-de-propuestas-mockups)
   - [Comparativa Técnica de Estructuración](#comparativa-técnica-de-estructuración)
+  - [Análisis Visual de las Mejoras Introducidas](#análisis-visual-de-las-mejoras-introducidas)
 - [3. Optimización de Estado y Recomposición con `derivedStateOf`](#3-optimización-de-estado-y-recomposición-con-derivedstateof)
   - [Fundamentos de Recomposición en Compose](#fundamentos-de-recomposición-en-compose)
   - [El Problema en la Implementación Anterior](#el-problema-en-la-implementación-anterior)
@@ -38,6 +41,16 @@ El objetivo del laboratorio consistió en construir una pantalla interactiva y r
 * **Cupón de Descuento**: Opción de activar un cupón promocional que aplica un **10% de descuento** sobre el subtotal acumulado.
 * **Resumen Dinámico en Tiempo Real**: Cálculo automático y visible del Subtotal, Descuento y Monto Total a pagar.
 * **Acción de Compra**: Botón principal interactivo `"COMPRAR"` de ancho completo.
+
+### Mockup de Requerimientos Inicial
+
+La especificación visual provista para el cine **Diego** contempla el diseño base para el flujo de compra de boletos:
+
+<p align="center">
+  <img src="docs/images/requirements-mockup.png" alt="Mockup de Requerimientos - Cine Diego" width="340" />
+  <br>
+  <em>Figura 1: Especificación y requerimiento visual de la pantalla de compra de entradas del Cine Diego.</em>
+</p>
 
 ---
 
@@ -172,6 +185,21 @@ Column(
 
 ---
 
+### Comparativa Visual de Propuestas (Mockups)
+
+Como se describe en las notas técnicas, aunque ambas propuestas obtienen un resultado visual exteriormente similar, la estructura interior está orientada a diferentes alcances técnicos y niveles de escalabilidad:
+
+<div align="center">
+
+| Propuesta 1 (Maquetación Plana e Imperativa) | Propuesta 2 (Jerarquía Modular y Declarativa) |
+| :---: | :---: |
+| <img src="docs/images/propuesta-1-mockup.png" alt="Mockup Propuesta 1" width="280" /> | <img src="docs/images/propuesta-2-mockup.png" alt="Mockup Propuesta 2" width="280" /> |
+| <em>Estructura rígida con Spacers manuales y cálculos imperativos directos.</em> | <em>Estructura modular en 6 subsecciones con <code>Arrangement.spacedBy</code> y <code>derivedStateOf</code>.</em> |
+
+</div>
+
+---
+
 ### Comparativa Técnica de Estructuración
 
 | Criterio | Propuesta Anterior (Plana) | Propuesta Implementada (Modular) | Impacto Técnico |
@@ -181,6 +209,18 @@ Column(
 | **Uso de `Spacer`** | 6 instancias manuales | 0 instancias | Reducción de nodos innecesarios en el árbol de composición |
 | **Mantenibilidad** | Frágil al modificar o reordenar bloques | Modular; cada sección se altera sin efectos colaterales | Menor costo de mantenimiento y refactorización |
 | **Preparación para Clean UI** | Baja | Alta; preparado para extraer subcomposables independientes | Código alineado a estándares de producción Android |
+
+---
+
+### Análisis Visual de las Mejoras Introducidas
+
+En el siguiente mockup de análisis técnico se desglosan en detalle las modificaciones estructurales y de optimización introducidas en la Propuesta 2:
+
+<p align="center">
+  <img src="docs/images/analisis-mejoras-mockup.png" alt="Análisis y Descomposición de Mejoras" width="760" />
+  <br>
+  <em>Figura 2: Análisis técnico y descomposición de las mejoras aplicadas en la Propuesta 2 (secciones modulares y estado derivado).</em>
+</p>
 
 ---
 
