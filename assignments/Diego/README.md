@@ -8,8 +8,19 @@ El desarrollo se enfoca en la aplicación de las mejores prácticas de la progra
 
 ---
 
+## Integrantes del Equipo
+
+1. **Arias Quispe, Jhonatan David**
+2. **Boza Portilla, Yordano Hernan**
+3. **Carbajal Gonzales, Diego Alenjando**
+4. **Cari Lipe, Paul Andree**
+5. **Mamani Huarsaya, Jorge Luis**
+
+---
+
 ## Tabla de Contenidos
 
+- [Integrantes del Equipo](#integrantes-del-equipo)
 - [1. Contexto y Requerimientos del Negocio](#1-contexto-y-requerimientos-del-negocio)
   - [Mockup de Requerimientos Inicial](#mockup-de-requerimientos-inicial)
 - [2. Evolución y Mejora en la Estructuración de la Interfaz (UI Layout)](#2-evolución-y-mejora-en-la-estructuración-de-la-interfaz-ui-layout)
