@@ -365,7 +365,7 @@ flowchart TD
 El proyecto se encuentra organizado en el módulo estándar de aplicación Android:
 
 ```text
-labs/Diego/
+assignments/Diego/
 ├── app/
 │   ├── build.gradle.kts                 # Configuración de dependencias (Compose Material3, AndroidX)
 │   └── src/
@@ -396,7 +396,7 @@ labs/Diego/
 Para validar la correcta compilación del código Kotlin y Compose en el módulo `Diego`:
 
 ```bash
-cd /home/george/George/I_programmer/University/4_year/2_semester/introduction_to_the_development_of_new_platforms/labs/Diego
+cd /home/george/George/I_programmer/University/4_year/2_semester/introduction_to_the_development_of_new_platforms/assignments/Diego
 ./gradlew compileDebugKotlin
 ```
 
