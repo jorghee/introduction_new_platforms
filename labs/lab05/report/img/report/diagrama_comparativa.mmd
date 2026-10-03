@@ -1,0 +1,13 @@
+%%{init: {'theme': 'neutral'}}%%
+graph TD
+  subgraph Antiguo: State Hoisting
+    A1[MainScreen] -- lambda onSeleccion() --> A2[EdificiosScreen]
+    A2 -- Retorna Evento --> A1
+    A1 -- Reasigna Estado --> A3[HomeScreen]
+  end
+  
+  subgraph Nuevo: Shared ViewModel
+    B1((ViewModel))
+    B2[EdificiosScreen] -- Llama función --> B1
+    B1 -- collectAsState() --> B3[HomeScreen]
+  end

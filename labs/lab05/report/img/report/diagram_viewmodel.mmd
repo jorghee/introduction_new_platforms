@@ -1,0 +1,9 @@
+graph TD
+    A[MainScreen] -- Inyección vía viewModel() --> B((SeleccionViewModel))
+    A -- Pasa Instancia --> C(HomeScreen)
+    A -- Pasa Instancia --> D(EdificiosScreen)
+    
+    subgraph Ciclo Reactivo
+        D -- Escribe dato --> B
+        B -- Emite StateFlow --> C
+    end

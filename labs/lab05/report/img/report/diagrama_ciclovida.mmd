@@ -1,0 +1,14 @@
+%%{init: {'theme': 'neutral'}}%%
+sequenceDiagram
+  participant OS as Sistema Operativo
+  participant NS as NavHost (Scope)
+  participant VM as SharedViewModel
+  
+  OS->>NS: Crea Actividad
+  NS->>VM: Solicita instanciación (viewModel)
+  VM-->>NS: Retorna Instancia (ID: 10A)
+  OS->>OS: Rotación de Pantalla
+  OS->>NS: Destruye y Recrea UI
+  NS->>VM: Solicita instanciación (viewModel)
+  VM-->>NS: Retorna misma Instancia (ID: 10A)
+  Note over NS,VM: El estado se retiene, previene pérdida de datos.

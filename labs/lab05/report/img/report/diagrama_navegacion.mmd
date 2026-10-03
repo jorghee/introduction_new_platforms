@@ -1,0 +1,14 @@
+%%{init: {'theme': 'neutral'}}%%
+graph LR
+  A((Usuario)) -->|Toca ícono| B[NavigationBar]
+  B -->|Route: home| C(HomeScreen)
+  B -->|Route: edificios| D(EdificiosScreen)
+  B -->|Route: mapa| E(MapaScreen)
+  B -->|Route: perfil| F(PerfilScreen)
+  
+  subgraph Jerarquía NavHost
+    C
+    D
+    E
+    F
+  end
