@@ -3,7 +3,7 @@ package com.example.navigationbar_multiple_composables.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
@@ -41,7 +41,7 @@ fun MainScreen() {
                 items.forEach { screen ->
                     val icon = when (screen) {
                         Screen.Home -> Icons.Default.Home
-                        Screen.Edificios -> Icons.Default.List
+                        Screen.Edificios -> Icons.AutoMirrored.Filled.List
                         Screen.Mapa -> Icons.Default.Place
                         Screen.Perfil -> Icons.Default.Person
                     }
