@@ -1,0 +1,121 @@
+{
+  "edificio": "Pabellón EPIS - Escuela Profesional de Ingeniería de Sistemas",
+  "piso": "Nivel 1",
+  "descripcion": "Distribución interactiva de laboratorios, auditorio y áreas comunes del pabellón principal.",
+  "ambientes": [
+    {
+      "id": "amb_lab101",
+      "nombre": "Lab 101 - Redes y Telecomunicaciones",
+      "etiqueta": "Lab 101\n(Redes)",
+      "x": 20.0,
+      "y": 30.0,
+      "ancho": 155.0,
+      "alto": 130.0,
+      "colorHex": "#F9ECEE",
+      "bordeHex": "#8B2635"
+    },
+    {
+      "id": "amb_lab102",
+      "nombre": "Lab 102 - Desarrollo de Software",
+      "etiqueta": "Lab 102\n(Software)",
+      "x": 195.0,
+      "y": 30.0,
+      "ancho": 155.0,
+      "alto": 130.0,
+      "colorHex": "#F3EFEA",
+      "bordeHex": "#594A42"
+    },
+    {
+      "id": "amb_aulamagna",
+      "nombre": "Aula Magna / Sala de Grados",
+      "etiqueta": "Aula Magna\n(Grados)",
+      "x": 20.0,
+      "y": 180.0,
+      "ancho": 155.0,
+      "alto": 130.0,
+      "colorHex": "#FDF6EE",
+      "bordeHex": "#8A6240"
+    },
+    {
+      "id": "amb_patio",
+      "nombre": "Patio Central y Conectividad",
+      "etiqueta": "Patio Central\n(WiFi Eduroam)",
+      "x": 195.0,
+      "y": 180.0,
+      "ancho": 155.0,
+      "alto": 130.0,
+      "colorHex": "#EEF3F2",
+      "bordeHex": "#3D5A54"
+    }
+  ],
+  "lineas": [
+    {
+      "startX": 185.0,
+      "startY": 20.0,
+      "endX": 185.0,
+      "endY": 320.0,
+      "colorHex": "#2E1E22",
+      "grosor": 4.0
+    },
+    {
+      "startX": 10.0,
+      "startY": 170.0,
+      "endX": 360.0,
+      "endY": 170.0,
+      "colorHex": "#2E1E22",
+      "grosor": 4.0
+    }
+  ],
+  "marcadores": [
+    {
+      "id": "m1",
+      "x": 97.5,
+      "y": 95.0,
+      "radio": 30.0,
+      "titulo": "Laboratorio 101 - Conectividad y Redes",
+      "descripcion": "Capacidad: 35 estaciones. Laboratorio de telecomunicaciones equipado con racks de switches Cisco, routers modulares y bancos de pruebas.",
+      "categoria": "Laboratorio",
+      "colorHex": "#721422"
+    },
+    {
+      "id": "m2",
+      "x": 272.5,
+      "y": 95.0,
+      "radio": 30.0,
+      "titulo": "Laboratorio 102 - Desarrollo de Software",
+      "descripcion": "Capacidad: 40 estaciones de trabajo de alto rendimiento. Entornos Android Studio, contenedores Docker y soporte de proyectos de investigación.",
+      "categoria": "Laboratorio",
+      "colorHex": "#8C1D40"
+    },
+    {
+      "id": "m3",
+      "x": 97.5,
+      "y": 245.0,
+      "radio": 30.0,
+      "titulo": "Aula Magna y Sala de Grados",
+      "descripcion": "Aforo: 80 personas. Sistema audiovisual de alta definición, proyector láser y climatización para ponencias y sustentaciones de tesis.",
+      "categoria": "Auditorio",
+      "colorHex": "#8A6240"
+    },
+    {
+      "id": "m4",
+      "x": 272.5,
+      "y": 245.0,
+      "radio": 30.0,
+      "titulo": "Patio Central y Conectividad",
+      "descripcion": "Área de interacción estudiantil con cobertura WiFi Eduroam, mesas de trabajo colaborativo y terminales de recarga.",
+      "categoria": "Área Común",
+      "colorHex": "#3D5A54"
+    },
+    {
+      "id": "m5",
+      "x": 185.0,
+      "y": 170.0,
+      "radio": 22.0,
+      "titulo": "Punto de Acceso e Información",
+      "descripcion": "Ingreso principal al pabellón. Paneles informativos, directorio de docentes y mapa físico de señalización y evacuación.",
+      "categoria": "Acceso",
+      "colorHex": "#4A3538"
+    }
+  ]
+}
