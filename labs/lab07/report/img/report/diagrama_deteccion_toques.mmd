@@ -1,0 +1,46 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F5F5F5', 'primaryTextColor': '#111111', 'primaryBorderColor': '#333333', 'lineColor': '#333333', 'fontFamily': 'arial' }}}%%
+flowchart LR
+    classDef terminal fill:#212121,stroke:#000000,stroke-width:1.5px,color:#FFFFFF;
+    classDef process fill:#FFFFFF,stroke:#333333,stroke-width:1.5px,color:#111111;
+    classDef decision fill:#F0F0F0,stroke:#222222,stroke-width:1.5px,color:#111111;
+    classDef action fill:#EAEAEA,stroke:#333333,stroke-width:1.5px,color:#111111;
+
+    Inicio(["Toque en Canvas:<br/>Offset(x, y)"]):::terminal
+
+    subgraph Fase1["Fase 1: Marcadores Circulares"]
+        direction TB
+        M_Eval["Iterar Marcadores"]:::process
+        M_Dist{"¿||Offset - Centro|| &le; r?"}:::decision
+        M_Hit["marcadorSeleccionado = marcador"]:::action
+        M_Dialog["Desplegar AlertDialog"]:::action
+        M_Next{"¿Quedan más?"}:::decision
+
+        M_Eval --> M_Dist
+        M_Dist -- "Sí" --> M_Hit --> M_Dialog
+        M_Dist -- "No" --> M_Next
+        M_Next -- "Sí" --> M_Eval
+    end
+
+    subgraph Fase2["Fase 2: Ambientes Rectangulares (AABB)"]
+        direction TB
+        A_Eval["Iterar Ambientes"]:::process
+        A_Dist{"¿Offset en límites AABB?<br/>x &isin; [x1,x2] y y &isin; [y1,y2]"}:::decision
+        A_Hit["ambienteSeleccionado = ambiente"]:::action
+        A_Stroke["Resaltar Borde Canvas (4 dp)"]:::action
+        A_Next{"¿Quedan más?"}:::decision
+
+        A_Eval --> A_Dist
+        A_Dist -- "Sí" --> A_Hit --> A_Stroke
+        A_Dist -- "No" --> A_Next
+        A_Next -- "Sí" --> A_Eval
+    end
+
+    Z_Clear["Fase 3: Zona Libre<br/>Limpiar selecciones"]:::action
+    Fin(["Fin de Interacción"]):::terminal
+
+    Inicio --> Fase1
+    M_Next -- "No" --> Fase2
+    A_Next -- "No" --> Z_Clear
+    M_Dialog --> Fin
+    A_Stroke --> Fin
+    Z_Clear --> Fin

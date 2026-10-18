@@ -1,0 +1,39 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#FAFAFA', 'primaryTextColor': '#111111', 'primaryBorderColor': '#333333', 'lineColor': '#333333', 'secondaryColor': '#EEEEEE', 'tertiaryColor': '#E0E0E0', 'actorBkg': '#F5F5F5', 'actorBorder': '#222222', 'actorTextColor': '#111111', 'signalColor': '#222222', 'signalTextColor': '#111111', 'activationBkgColor': '#E0E0E0', 'activationBorderColor': '#333333', 'sequenceNumberColor': '#FFFFFF', 'fontFamily': 'arial' }}}%%
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant C as Canvas Composable
+    participant P as detectTapGestures
+    participant VM as PlanoViewModel
+    participant S as "StateFlow<PlanoUiState>"
+    participant D as AlertDialog
+
+    U->>C: Toca la superficie del Canvas
+    activate C
+    C->>P: Propaga evento físico de toque
+    deactivate C
+    activate P
+    P->>VM: procesarToqueEnCanvas(offset)
+    deactivate P
+    activate VM
+    VM->>VM: Evalúa ||offset - centro|| <= radio
+    VM->>S: _uiState.update { copy(marcadorSeleccionado) }
+    deactivate VM
+    activate S
+    S-->>C: Emite nuevo estado (collectAsStateWithLifecycle)
+    deactivate S
+    activate C
+    C->>C: Recomposición reactiva del DrawScope
+    C->>D: Instancia y despliega diálogo con ficha técnica
+    deactivate C
+    activate D
+    D-->>U: Visualiza título, categoría y descripción
+    U->>D: Pulsa botón "Entendido / Cerrar"
+    D->>VM: cerrarDialogoMarcador()
+    deactivate D
+    activate VM
+    VM->>S: _uiState.update { copy(marcadorSeleccionado = null) }
+    deactivate VM
+    activate S
+    S-->>D: Notifica estado null (descarta diálogo en UI)
+    deactivate S

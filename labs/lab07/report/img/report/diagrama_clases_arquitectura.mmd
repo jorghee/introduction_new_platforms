@@ -1,0 +1,85 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F5F5F5', 'primaryTextColor': '#111111', 'primaryBorderColor': '#333333', 'lineColor': '#333333', 'secondaryColor': '#EEEEEE', 'tertiaryColor': '#E0E0E0', 'fontFamily': 'arial' }}}%%
+classDiagram
+    direction TB
+
+    class PlanoEdificio {
+        +String edificio
+        +String piso
+        +String descripcion
+        +List~Ambiente~ ambientes
+        +List~LineaPlano~ lineas
+        +List~Marcador~ marcadores
+    }
+
+    class Ambiente {
+        +String id
+        +String nombre
+        +String etiqueta
+        +Offset topLeft
+        +Size size
+        +String colorHex
+        +String bordeHex
+        +contienePunto(Offset punto) Boolean
+    }
+
+    class Marcador {
+        +Offset offset
+        +Float radio
+        +String titulo
+        +String descripcion
+        +String id
+        +String categoria
+        +String colorHex
+    }
+
+    class LineaPlano {
+        +Offset start
+        +Offset end
+        +String colorHex
+        +Float grosor
+    }
+
+    class PlanoRepository {
+        -Context context
+        +cargarPlanoDesdeAssets(String fileName) Result~PlanoEdificio~
+        +obtenerPlanoDocenteMuestra() PlanoEdificio
+        -parsearPlanoJson(String json) PlanoEdificio
+    }
+
+    class PlanoViewModel {
+        -PlanoRepository repository
+        -MutableStateFlow~PlanoUiState~ _uiState
+        +StateFlow~PlanoUiState~ uiState
+        +cargarPlanoEpis() Unit
+        +cargarPlanoDocente() Unit
+        +procesarToqueEnCanvas(Offset offset) Unit
+        +cerrarDialogoMarcador() Unit
+        +limpiarSeleccion() Unit
+        +alternarModo(ModoVisualizacion modo) Unit
+    }
+
+    class PlanoUiState {
+        +Boolean cargando
+        +PlanoEdificio plano
+        +Marcador marcadorSeleccionado
+        +Ambiente ambienteSeleccionado
+        +ModoVisualizacion modo
+        +String mensajeError
+    }
+
+    class ModoVisualizacion {
+        <<enumeration>>
+        PABELLON_EPIS
+        DOCENTE_MUESTRA
+    }
+
+    PlanoEdificio "1" *-- "many" Ambiente : compone
+    PlanoEdificio "1" *-- "many" Marcador : compone
+    PlanoEdificio "1" *-- "many" LineaPlano : compone
+    PlanoRepository ..> PlanoEdificio : instancia
+    PlanoViewModel --> PlanoRepository : utiliza
+    PlanoViewModel --> PlanoUiState : expone
+    PlanoUiState --> PlanoEdificio : referencia
+    PlanoUiState --> Marcador : seleccionado
+    PlanoUiState --> Ambiente : seleccionado
+    PlanoUiState --> ModoVisualizacion : modo

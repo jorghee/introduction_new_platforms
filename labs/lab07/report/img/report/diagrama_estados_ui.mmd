@@ -1,0 +1,32 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F5F5F5', 'primaryTextColor': '#111111', 'primaryBorderColor': '#333333', 'lineColor': '#333333', 'secondaryColor': '#EEEEEE', 'tertiaryColor': '#E0E0E0', 'labelColor': '#111111', 'fontFamily': 'arial' }}}%%
+stateDiagram-v2
+    direction TB
+
+    [*] --> Inicializando : Inicio de ViewModel
+
+    state Inicializando {
+        [*] --> LeyendoAssets : PlanoRepository.cargarPlano()
+        LeyendoAssets --> DeserializandoJSON : Stream abierto
+    }
+
+    Inicializando --> ErrorCarga : Excepción de lectura / JSON inválido
+    Inicializando --> ModoPabellonEpis : Carga exitosa de plano_epis.json
+
+    state ModoPabellonEpis {
+        [*] --> VistaBaseEpis : Renderizado 4 Ambientes
+        VistaBaseEpis --> MarcadorEpisActivo : procesarToque (d <= radio)
+        MarcadorEpisActivo --> VistaBaseEpis : cerrarDialogoMarcador()
+        VistaBaseEpis --> AmbienteResaltado : procesarToque (colisión AABB)
+        AmbienteResaltado --> VistaBaseEpis : limpiarSeleccion() / Toque libre
+    }
+
+    state ModoDocenteMuestra {
+        [*] --> VistaBaseDocente : Renderizado 2 Salones
+        VistaBaseDocente --> MarcadorDocenteActivo : procesarToque (Sala A o B)
+        MarcadorDocenteActivo --> VistaBaseDocente : cerrarDialogoMarcador()
+    }
+
+    ModoPabellonEpis --> ModoDocenteMuestra : alternarModo(DOCENTE_MUESTRA)
+    ModoDocenteMuestra --> ModoPabellonEpis : alternarModo(PABELLON_EPIS)
+
+    ErrorCarga --> Inicializando : Reintentar recarga
