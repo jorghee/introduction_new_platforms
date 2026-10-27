@@ -1,0 +1,21 @@
+erDiagram
+    EdificioEntity ||--o{ AmbienteEntity : "alberga (1:N)"
+    AmbienteEntity ||--o{ NotaEntity : "registra (1:N)"
+
+    EdificioEntity {
+        int id PK "autoincremental"
+        string nombre "nombre del edificio"
+        string categoria "clasificación funcional"
+    }
+
+    AmbienteEntity {
+        int id PK "autoincremental"
+        int edificioId FK "referencia a EdificioEntity(id)"
+        string nombre "nombre del ambiente o laboratorio"
+    }
+
+    NotaEntity {
+        int id PK "autoincremental"
+        int ambienteId FK "referencia a AmbienteEntity(id)"
+        string texto "observación, estado o apunte"
+    }

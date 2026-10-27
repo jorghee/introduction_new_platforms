@@ -2,10 +2,13 @@
 
 #lab-section(title: "CONCLUSIONES")[
 
-  - *Persistencia estructurada y tipada con Room:* [Conclusión sobre la arquitectura de Room y su validación en tiempo de compilación frente a SQLite tradicional.]
+  - *Validación estricta y seguridad de tipos en tiempo de compilación:* La integración de Room a través de KSP (_Kotlin Symbol Processing_) frente a SQLite tradicional (`SQLiteOpenHelper`) erradica por completo los fallos en tiempo de ejecución derivados de errores de sintaxis en sentencias SQL o desajustes entre tipos de datos de las columnas y las clases del modelo. Al verificar la validez de las consultas SQL, las anotaciones y los esquemas relacionales durante el proceso de compilación, Room proporciona una garantía de robustez de nivel empresarial indispensable para aplicaciones de misión crítica.
 
-  - *Manejo reactivo de consultas relacionales:* [Conclusión sobre las anotaciones `@Relation` y `@Transaction` junto a coroutines y Flow.]
+  - *Modelado relacional y transaccionalidad atómica con `@Relation`:* La estrategia de modelado relacional empleada mediante las clases `EdificioConAmbientes` y `AmbienteConNotas` demostró la capacidad de Room para resolver relaciones jerárquicas complejas ($1 : N$) sin necesidad de escribir complejas consultas con sentencias `JOIN` manuales. La obligatoriedad de la anotación `@Transaction` en los métodos del DAO asegura la atomicidad en la recuperación multiconsulta, evitando lecturas sucias o inconsistencias temporales en entornos concurrentes y reactivos.
 
-  - *Desacoplamiento arquitectural y ciclo de vida:* [Conclusión sobre la integración entre Room, ViewModel y Jetpack Compose.]
+  - *Arquitectura desacoplada y flujo de datos unidireccional (UDF):* La estructuración del sistema mediante el patrón MVVM y la capa de Repositorio consolidó una nítida separación de responsabilidades. Al abstraer el acceso a datos detrás de `EdificioRepository` y exponer flujos observables (`StateFlow`) desde el `EdificiosViewModel`, los componentes gráficos de Jetpack Compose (`LazyColumn`, `TabRow`, `AlertDialog`) operan como consumidores puros de estado, facilitando el mantenimiento, la modularidad y la futura implementación de pruebas unitarias o de instrumentación.
 
+  - *Integridad referencial y optimización de índices en SQLite:* La configuración explícita de claves foráneas con reglas de eliminación en cascada (`ForeignKey.CASCADE`) garantiza la integridad estructural de la base de datos, impidiendo la existencia de registros huérfanos cuando se elimina una entidad contenedora (edificio o ambiente). Asimismo, la creación de índices específicos sobre las columnas de clave foránea optimiza los tiempos de respuesta del motor SQLite al evitar escaneos de tabla completa (_full table scans_) en operaciones de búsqueda y borrado masivo.
+
+  - *Seguridad por diseño mediante almacenamiento interno y Sandboxing:* La persistencia física en el almacenamiento interno privado (`/data/data/<paquete>/databases/app.db`) respaldada por el modelo de permisos POSIX y el _Sandboxing_ del kernel de Android garantiza el aislamiento total de los datos frente a accesos no autorizados de otras aplicaciones instaladas en el dispositivo, asegurando el cumplimiento de los estándares internacionales de privacidad y protección de datos del usuario.
 ]
