@@ -7,9 +7,14 @@ import androidx.room.RoomDatabase
 import com.example.persistenciaroom_compose.data.local.dao.EdificioDao
 import com.example.persistenciaroom_compose.data.local.entity.AmbienteEntity
 import com.example.persistenciaroom_compose.data.local.entity.EdificioEntity
+import com.example.persistenciaroom_compose.data.local.entity.NotaEntity
 
 @Database(
-    entities = [EdificioEntity::class, AmbienteEntity::class],
+    entities = [
+        EdificioEntity::class,
+        AmbienteEntity::class,
+        NotaEntity::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -26,7 +31,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app.db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(true)
+                    .build()
                 INSTANCE = instance
                 instance
             }
