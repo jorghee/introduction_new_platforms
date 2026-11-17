@@ -3,7 +3,8 @@
 #lab-section(title: "RESULTADOS DE LAS ACTIVIDADES")[
 
   #v(0.2em)
-  #highlight(fill: rgb("fff176"))[*Link del repositorio GitHub*]: #link("https://github.com/jorghee/introduction_new_platforms/tree/main/labs/lab11")[https://github.com/jorghee/introduction_new_platforms/tree/main/labs/lab11]
+  #highlight(fill: rgb("fff176"))[*Link del repositorio GitHub*]: #link("https://github.com/jorghee/introduction_new_platforms/tree/main/labs/lab11")[https://github.com/jorghee/introduction_new_platforms/tree/main/labs/lab11]\
+  #highlight(fill: rgb("fff176"))[*Link del video de demostración*]: #link("https://drive.google.com/file/d/1BQiStlu0v0iqLExplTjkHP83Erxem55e/view?usp=drive_link")[https://drive.google.com/file/d/1BQiStlu0v0iqLExplTjkHP83Erxem55e/view?usp=drive_link]
   #v(0.6em)
 
   == Arquitectura Modular y Separación de Responsabilidades
@@ -11,8 +12,8 @@
   En el desarrollo de aplicaciones móviles profesionales bajo Android y Jetpack Compose, concentrar la lógica de servicios en segundo plano, persistencia local y presentación en un único archivo (como `MainActivity.kt`) representa un antipatrón que degrada la mantenibilidad, dificulta las pruebas unitarias y propicia fugas de memoria. La solución implementada estructura el proyecto aplicando estrictamente el principio de responsabilidad única (SRP) y una clara separación de capas:
 
   - *Capa de Presentación (`ui/`)*: Subdividida en `screens/` (pantalla orquestadora `AudioGuiaScreen`), `components/` (componentes modulares reutilizables como `TarjetaEdificioActual`, `ControlesPrincipales`, `BotonContinuarUltimo`, `ListaEdificiosCampus` y `BannerCicloVida`) y `viewmodel/` (`AudioGuiaViewModel`), garantizando una interfaz de usuario puramente declarativa, minimalista, con bordes refinados y reactiva a flujos de estado inmutables.
-  - *Capa de Servicio (`service/`)*: `AudioGuiaService` opera de manera autónoma como un _Foreground Service_ de tipo `mediaPlayback`. Gestiona el ciclo de vida del reproductor nativo `MediaPlayer`, vincula la sesión multimedia con `MediaSessionCompat`, solicita foco de audio mediante `AudioManager.requestAudioFocus`, interactúa con el `NotificationManager` mediante estilos multimedia (`MediaStyle`) y publica su estado operativo a través de `StateFlow<AudioPlaybackState>`.
-  - *Capa de Datos y Persistencia (`data/`)*: Aloja el modelo de dominio (`Edificio`), el repositorio (`AudioGuiaRepository`) y la capa Room (`AppDatabase`, `UltimoEdificioDao`, `UltimoEdificioEntity`) que interactúa con la base de datos relacional SQLite `audioguia_campus.db`.
+  - *Capa de Servicio (`service/`)*: `AudioGuiaService` opera de manera autónoma como un _Foreground Service_ de tipo `mediaPlayback` @android_foreground_services. Gestiona el ciclo de vida del reproductor nativo `MediaPlayer` @android_mediaplayer, vincula la sesión multimedia con `MediaSessionCompat`, solicita foco de audio mediante `AudioManager.requestAudioFocus`, interactúa con el `NotificationManager` mediante estilos multimedia (`MediaStyle`) @android_media_notification y publica su estado operativo a través de `StateFlow<AudioPlaybackState>`.
+  - *Capa de Datos y Persistencia (`data/`)*: Aloja el modelo de dominio (`Edificio`), el repositorio (`AudioGuiaRepository`) y la capa Room (`AppDatabase`, `UltimoEdificioDao`, `UltimoEdificioEntity`) que interactúa con la base de datos relacional SQLite `audioguia_campus.db` @room_persistence.
 
   #figure(
     image("../img/report/diagrama_arquitectura.png", width: 95%),

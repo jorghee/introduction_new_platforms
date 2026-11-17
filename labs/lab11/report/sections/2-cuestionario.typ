@@ -76,7 +76,7 @@
   #colbreak()
   === 3. En forma individual, comenta en el video de referencia qué diferencia encuentras entre la forma de mostrar la notificación en el video y el control de visibilidad basado en `ProcessLifecycleOwner` implementado en este laboratorio.
 
-  Se realizó la visualización y análisis crítico del video de referencia (#link("https://www.youtube.com/watch?v=-45jGLtbhPQ")[https://www.youtube.com/watch?v=-45jGLtbhPQ]), contrastando la técnica convencional de instanciación estática de notificaciones en Foreground Services frente al control reactivo de visibilidad basado en `ProcessLifecycleOwner`. Cada integrante publicó su análisis técnico de manera individual:
+  Se realizó la visualización y análisis crítico del video de referencia @video_foreground_service (#link("https://www.youtube.com/watch?v=-45jGLtbhPQ")[https://www.youtube.com/watch?v=-45jGLtbhPQ]), contrastando la técnica convencional de instanciación estática de notificaciones en Foreground Services @android_foreground_services frente al control reactivo de visibilidad basado en `ProcessLifecycleOwner` @android_process_lifecycle. Cada integrante publicó su análisis técnico de manera individual:
 
   #v(0.4em)
   ==== Jorge Luis Mamani Huarsaya

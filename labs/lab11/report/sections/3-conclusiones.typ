@@ -3,17 +3,17 @@
 #lab-section(title: "CONCLUSIONES")[
 
   1. *Resiliencia de Procesos Multimedia frente al Low Memory Killer (LMK):*
-     La implementación de un _Foreground Service_ de tipo `mediaPlayback` demostró ser indispensable para garantizar la reproducción continua e ininterrumpida de audio en dispositivos Android modernos. Al vincular el servicio a una notificación persistente mediante `startForeground()`, el kernel de Linux eleva la prioridad del proceso (reduciendo drásticamente su `oom_score_adj`), protegiéndolo de la terminación agresiva por parte del Low Memory Killer incluso en situaciones de alta presión de memoria RAM en el sistema.
+     La implementación de un _Foreground Service_ de tipo `mediaPlayback` vincula el proceso a una notificación persistente mediante `startForeground()`. Esto eleva su prioridad operativa en el kernel de Linux (`oom_score_adj`), protegiéndolo de la terminación intempestiva por presión de memoria RAM y garantizando la reproducción ininterrumpida de audio.
 
   2. *Descentralización del Control Operativo con NotificationCompat.MediaStyle:*
-     El empleo de `MediaStyle` en combinación con `PendingIntent.getService` permite extender la funcionalidad de la aplicación más allá de la ventana gráfica tradicional. Al exponer botones de acción multimedia interactivos ("Pausar/Reanudar", "Siguiente edificio" y "Detener") directamente en la cortina de notificaciones y en la pantalla de bloqueo, se proporciona al usuario un mecanismo accesible y ergonómico para controlar la audio-guía del campus sin necesidad de desbloquear o conmutar de aplicación.
+     El empleo de `MediaStyle` con `PendingIntent` traslada los controles esenciales ("Pausar/Reanudar", "Siguiente" y "Detener") a la cortina de notificaciones y pantalla de bloqueo, permitiendo al usuario interactuar con la audio-guía de forma inmediata sin necesidad de mantener la aplicación abierta.
 
   3. *Conciencia Contextual del Ciclo de Vida mediante ProcessLifecycleOwner:*
-     A diferencia de los observadores de ciclo de vida atados a una única `Activity`, `ProcessLifecycleOwner` proporciona una visión holística y reactiva del estado operativo de toda la aplicación. La detección precisa de los eventos `ON_START` (retorno a primer plano) y `ON_STOP` (paso a segundo plano) permite sincronizar dinámicamente indicadores de estado, optimizar recursos computacionales y coordinar la UI declarativa de Jetpack Compose con los servicios del sistema sin provocar fugas de memoria ni desincronización de flujos.
+     `ProcessLifecycleOwner` permite monitorear el ciclo de vida global de la aplicación (`ON_START` y `ON_STOP`). Esta conciencia contextual coordina la UI declarativa de Jetpack Compose con los servicios en segundo plano, adaptando los indicadores visuales y optimizando los recursos del sistema sin provocar fugas de memoria.
 
-  4. *Sincronización Reactiva de Estado entre Servicios y Jetpack Compose:*
-     La integración de `StateFlow` como canal de comunicación unidireccional entre `AudioGuiaService`, `AudioGuiaViewModel` y los componentes Composable demuestra ser la solución arquitectónica idónea frente a patrones heredados como `BroadcastReceiver` locales o `Bound Services` con interfaces AIDL complejas. El ViewModel recolecta de manera segura los estados emitidos por el reproductor (`posicionMs`, `duracionMs`, `estaReproduciendo`, `edificioActual`), asegurando recomposiciones eficientes y fluidas en la interfaz gráfica.
+  4. *Sincronización Reactiva Unidireccional con StateFlow:*
+     La comunicación entre `AudioGuiaService`, `AudioGuiaViewModel` y los componentes Composable a través de `StateFlow` desacopla la lógica multimedia de la capa visual. El ViewModel recolecta de forma segura el progreso (`posicionMs`, `duracionMs`) y estado operativo, garantizando recomposiciones fluidas.
 
-  5. *Persistencia Local Determinística y Recuperación de Sesión con Room Database:*
-     La persistencia automática del último punto de interés visitado en una base de datos relacional SQLite gestionada por Room (`audioguia_campus.db`) garantiza una experiencia de usuario continua. Al iniciar la aplicación en frío, el flujo reactivo de Room (`Flow<UltimoEdificioEntity?>`) expone inmediatamente el registro persistido, permitiendo al usuario retomar la audio-guía mediante un único toque con el botón "Continuar", consolidando una arquitectura desacoplada, tolerante a fallos y alineada con las mejores prácticas de la ingeniería de software móvil.
+  5. *Persistencia Determinística y Continuidad de Sesión con Room Database:*
+     La persistencia local del último punto de interés en SQLite (`audioguia_campus.db`) mediante Room permite reanudar el recorrido tras cerrar la aplicación. La observación reactiva de `Flow<UltimoEdificioEntity?>` expone de inmediato el estado guardado, consolidando una arquitectura desacoplada, tolerante a fallos y orientada a la experiencia de usuario.
 ]
