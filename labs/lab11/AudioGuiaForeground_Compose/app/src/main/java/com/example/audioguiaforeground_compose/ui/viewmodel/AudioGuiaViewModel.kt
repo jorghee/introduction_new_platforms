@@ -63,18 +63,27 @@ class AudioGuiaViewModel(
     }
 
     fun siguienteEdificio() {
-        val intent = Intent(getApplication(), AudioGuiaService::class.java).apply {
-            action = AudioGuiaService.ACCION_SIGUIENTE
+        if (playbackState.value.servicioActivo) {
+            val intent = Intent(getApplication(), AudioGuiaService::class.java).apply {
+                action = AudioGuiaService.ACCION_SIGUIENTE
+            }
+            iniciarServicio(intent)
+        } else {
+            val siguiente = EdificiosData.obtenerSiguiente(playbackState.value.edificioActual.id)
+            AudioGuiaService.seleccionarEdificioSinServicio(siguiente)
         }
-        iniciarServicio(intent)
     }
 
     fun seleccionarEdificio(edificio: Edificio) {
-        val intent = Intent(getApplication(), AudioGuiaService::class.java).apply {
-            action = AudioGuiaService.ACCION_SELECCIONAR
-            putExtra(AudioGuiaService.EXTRA_EDIFICIO_ID, edificio.id)
+        if (playbackState.value.servicioActivo) {
+            val intent = Intent(getApplication(), AudioGuiaService::class.java).apply {
+                action = AudioGuiaService.ACCION_SELECCIONAR
+                putExtra(AudioGuiaService.EXTRA_EDIFICIO_ID, edificio.id)
+            }
+            iniciarServicio(intent)
+        } else {
+            AudioGuiaService.seleccionarEdificioSinServicio(edificio)
         }
-        iniciarServicio(intent)
     }
 
     fun continuarUltimoEdificio() {

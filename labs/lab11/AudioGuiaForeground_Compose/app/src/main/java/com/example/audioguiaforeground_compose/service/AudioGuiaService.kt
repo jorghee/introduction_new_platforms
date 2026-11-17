@@ -37,6 +37,7 @@ class AudioGuiaService : Service() {
     private var mediaPlayer: MediaPlayer? = null
     private var mediaSession: MediaSessionCompat? = null
     private var audioFocusRequest: AudioFocusRequest? = null
+    private var tieneAudioFocus = false
     private var trackerJob: Job? = null
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
@@ -48,11 +49,21 @@ class AudioGuiaService : Service() {
         const val ACCION_SELECCIONAR = "com.example.audioguiaforeground_compose.SELECCIONAR"
         const val EXTRA_EDIFICIO_ID = "extra_edificio_id"
 
-        private const val ID_CANAL = "canal_audioguia_v2"
+        private const val ID_CANAL = "canal_audioguia_media_v5"
         private const val ID_NOTIFICACION = 1
 
         private val _playbackState = MutableStateFlow(AudioPlaybackState())
         val playbackState: StateFlow<AudioPlaybackState> = _playbackState.asStateFlow()
+
+        fun seleccionarEdificioSinServicio(edificio: Edificio) {
+            _playbackState.value = _playbackState.value.copy(
+                edificioActual = edificio,
+                posicionMs = 0,
+                duracionMs = 30720,
+                estaReproduciendo = false,
+                estaPausado = false
+            )
+        }
     }
 
     override fun onCreate() {
@@ -76,30 +87,78 @@ class AudioGuiaService : Service() {
                 detenerAudio()
             }
             ACCION_SIGUIENTE -> {
-                avanzarSiguienteEdificio()
+                val siguiente = EdificiosData.obtenerSiguiente(_playbackState.value.edificioActual.id)
+                cambiarEdificio(siguiente.id)
             }
             ACCION_SELECCIONAR -> {
                 val edificioId = intent.getIntExtra(EXTRA_EDIFICIO_ID, 1)
-                iniciarAudioNuevo(edificioId)
+                cambiarEdificio(edificioId)
             }
         }
         return START_NOT_STICKY
+    }
+
+    private fun prepararMediaPlayer(edificio: Edificio): MediaPlayer? {
+        liberarMediaPlayer()
+        return try {
+            val audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
+
+            val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+            val sessionId = audioManager.generateAudioSessionId()
+
+            MediaPlayer.create(applicationContext, edificio.audioResId, audioAttributes, sessionId)?.apply {
+                setVolume(1.0f, 1.0f)
+                isLooping = false
+                setOnErrorListener { _, what, extra ->
+                    android.util.Log.e("AudioGuiaService", "MediaPlayer error: what=$what, extra=$extra")
+                    true
+                }
+                setOnCompletionListener {
+                    detenerMonitoreoProgreso()
+                    actualizarEstado(
+                        servicioActivo = true,
+                        estaReproduciendo = false,
+                        estaPausado = false,
+                        edificio = edificio,
+                        posicionMs = 0,
+                        duracionMs = duration
+                    )
+                    actualizarNotificacion(edificio, estaReproduciendo = false)
+                }
+                mediaPlayer = this
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     private fun iniciarOReanudarAudio(edificioId: Int) {
         val estadoActual = _playbackState.value
         val edificio = EdificiosData.obtenerPorId(edificioId)
 
-        if (mediaPlayer != null && estadoActual.edificioActual.id == edificioId && estadoActual.estaPausado) {
+        if (mediaPlayer != null && estadoActual.edificioActual.id == edificioId) {
             solicitarAudioFocus()
-            mediaPlayer?.start()
+            val player = mediaPlayer!!
+            val pos = player.currentPosition
+            val dur = player.duration
+            if (dur > 0 && pos >= dur - 500) {
+                player.seekTo(0)
+            }
+            player.start()
             actualizarEstado(
                 servicioActivo = true,
                 estaReproduciendo = true,
                 estaPausado = false,
-                edificio = edificio
+                edificio = edificio,
+                posicionMs = player.currentPosition,
+                duracionMs = if (dur > 0) dur else estadoActual.duracionMs
             )
-            actualizarNotificacion(edificio, estaReproduciendo = true)
+            val notificacion = construirNotificacion(edificio, estaReproduciendo = true)
+            startForeground(ID_NOTIFICACION, notificacion)
             iniciarMonitoreoProgreso()
         } else {
             iniciarAudioNuevo(edificioId)
@@ -108,40 +167,13 @@ class AudioGuiaService : Service() {
 
     private fun iniciarAudioNuevo(edificioId: Int) {
         val edificio = EdificiosData.obtenerPorId(edificioId)
-
-        liberarMediaPlayer()
+        val player = prepararMediaPlayer(edificio) ?: return
 
         try {
             solicitarAudioFocus()
+            player.start()
 
-            val audioAttributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build()
-
-            val afd = resources.openRawResourceFd(edificio.audioResId)
-            mediaPlayer = MediaPlayer().apply {
-                setAudioAttributes(audioAttributes)
-                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                afd.close()
-                prepare()
-                setVolume(1.0f, 1.0f)
-                isLooping = false
-                setOnCompletionListener {
-                    actualizarEstado(
-                        servicioActivo = true,
-                        estaReproduciendo = false,
-                        estaPausado = true,
-                        edificio = edificio,
-                        posicionMs = duration,
-                        duracionMs = duration
-                    )
-                    actualizarNotificacion(edificio, estaReproduciendo = false)
-                }
-                start()
-            }
-
-            val duracion = mediaPlayer?.duration ?: 0
+            val duracion = player.duration
             actualizarEstado(
                 servicioActivo = true,
                 estaReproduciendo = true,
@@ -164,6 +196,29 @@ class AudioGuiaService : Service() {
         }
     }
 
+    private fun cambiarEdificio(edificioId: Int) {
+        val edificio = EdificiosData.obtenerPorId(edificioId)
+        detenerMonitoreoProgreso()
+
+        // Dejar el reproductor preparado para el nuevo edificio sin reproducir
+        val player = prepararMediaPlayer(edificio)
+        val duracion = player?.duration ?: 30720
+
+        actualizarEstado(
+            servicioActivo = _playbackState.value.servicioActivo,
+            estaReproduciendo = false,
+            estaPausado = false,
+            edificio = edificio,
+            posicionMs = 0,
+            duracionMs = duracion
+        )
+        persistirUltimoEdificioEnRoom(edificio)
+
+        if (_playbackState.value.servicioActivo) {
+            actualizarNotificacion(edificio, estaReproduciendo = false)
+        }
+    }
+
     private fun pausarAudio() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
@@ -171,11 +226,16 @@ class AudioGuiaService : Service() {
         detenerMonitoreoProgreso()
 
         val edificio = _playbackState.value.edificioActual
+        val pos = mediaPlayer?.currentPosition ?: _playbackState.value.posicionMs
+        val dur = mediaPlayer?.duration ?: _playbackState.value.duracionMs
+
         actualizarEstado(
             servicioActivo = true,
             estaReproduciendo = false,
             estaPausado = true,
-            edificio = edificio
+            edificio = edificio,
+            posicionMs = pos,
+            duracionMs = dur
         )
         actualizarNotificacion(edificio, estaReproduciendo = false)
     }
@@ -201,51 +261,76 @@ class AudioGuiaService : Service() {
 
     private fun avanzarSiguienteEdificio() {
         val siguiente = EdificiosData.obtenerSiguiente(_playbackState.value.edificioActual.id)
-        iniciarAudioNuevo(siguiente.id)
+        cambiarEdificio(siguiente.id)
     }
 
-    private fun solicitarAudioFocus() {
+    private fun solicitarAudioFocus(): Boolean {
+        if (tieneAudioFocus) return true
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val audioAttributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build()
+            if (audioFocusRequest == null) {
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build()
 
-            val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(audioAttributes)
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener { focusChange ->
-                    when (focusChange) {
-                        AudioManager.AUDIOFOCUS_LOSS -> pausarAudio()
-                        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                            if (mediaPlayer?.isPlaying == true) {
-                                mediaPlayer?.pause()
+                audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(audioAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener { focusChange ->
+                        when (focusChange) {
+                            AudioManager.AUDIOFOCUS_LOSS -> {
+                                tieneAudioFocus = false
+                                pausarAudio()
                             }
-                        }
-                        AudioManager.AUDIOFOCUS_GAIN -> {
-                            if (_playbackState.value.estaReproduciendo) {
-                                mediaPlayer?.start()
+                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                                if (mediaPlayer?.isPlaying == true) {
+                                    mediaPlayer?.pause()
+                                    actualizarEstado(
+                                        servicioActivo = true,
+                                        estaReproduciendo = false,
+                                        estaPausado = true,
+                                        edificio = _playbackState.value.edificioActual
+                                    )
+                                    actualizarNotificacion(_playbackState.value.edificioActual, estaReproduciendo = false)
+                                }
+                            }
+                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                                mediaPlayer?.setVolume(0.2f, 0.2f)
+                            }
+                            AudioManager.AUDIOFOCUS_GAIN -> {
+                                tieneAudioFocus = true
+                                mediaPlayer?.setVolume(1.0f, 1.0f)
+                                if (_playbackState.value.estaReproduciendo && mediaPlayer?.isPlaying == false) {
+                                    mediaPlayer?.start()
+                                }
                             }
                         }
                     }
-                }
-                .build()
-            audioFocusRequest = request
-            audioManager.requestAudioFocus(request)
+                    .build()
+            }
+            val res = audioManager.requestAudioFocus(audioFocusRequest!!)
+            tieneAudioFocus = (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+            return tieneAudioFocus
         } else {
             @Suppress("DEPRECATION")
-            audioManager.requestAudioFocus(
+            val res = audioManager.requestAudioFocus(
                 { focusChange ->
-                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) pausarAudio()
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        tieneAudioFocus = false
+                        pausarAudio()
+                    }
                 },
                 AudioManager.STREAM_MUSIC,
                 AudioManager.AUDIOFOCUS_GAIN
             )
+            tieneAudioFocus = (res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+            return tieneAudioFocus
         }
     }
 
     private fun abandonarAudioFocus() {
+        if (!tieneAudioFocus && audioFocusRequest == null) return
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             audioFocusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
@@ -254,6 +339,7 @@ class AudioGuiaService : Service() {
             @Suppress("DEPRECATION")
             audioManager.abandonAudioFocus(null)
         }
+        tieneAudioFocus = false
     }
 
     private fun persistirUltimoEdificioEnRoom(edificio: Edificio) {
@@ -282,12 +368,14 @@ class AudioGuiaService : Service() {
                 if (player != null && player.isPlaying) {
                     val pos = player.currentPosition
                     val dur = player.duration
-                    _playbackState.value = _playbackState.value.copy(
-                        posicionMs = pos,
-                        duracionMs = dur
-                    )
+                    if (dur > 0) {
+                        _playbackState.value = _playbackState.value.copy(
+                            posicionMs = pos,
+                            duracionMs = dur
+                        )
+                    }
                 }
-                delay(500)
+                delay(250)
             }
         }
     }
@@ -331,19 +419,21 @@ class AudioGuiaService : Service() {
             val canal = NotificationChannel(
                 ID_CANAL,
                 "Reproductor Multimedia",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Canal para el reproductor de narraciones de audio"
-                setShowBadge(true)
+                setShowBadge(false)
+                setSound(null, null)
+                enableVibration(false)
             }
             val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(canal)
+            manager?.createNotificationChannel(canal)
         }
     }
 
     private fun actualizarNotificacion(edificio: Edificio, estaReproduciendo: Boolean) {
         val manager = getSystemService(NotificationManager::class.java)
-        manager.notify(ID_NOTIFICACION, construirNotificacion(edificio, estaReproduciendo))
+        manager?.notify(ID_NOTIFICACION, construirNotificacion(edificio, estaReproduciendo))
     }
 
     /**
@@ -405,6 +495,8 @@ class AudioGuiaService : Service() {
             .setSmallIcon(if (estaReproduciendo) android.R.drawable.ic_media_play else android.R.drawable.ic_media_pause)
             .setContentIntent(pendingIntentPrincipal)
             .setOngoing(estaReproduciendo)
+            .setOnlyAlertOnce(true)
+            .setSilent(true)
             .addAction(accionPlayPauseIcono, accionPlayPauseTexto, pendingIntentPlayPause)
             .addAction(android.R.drawable.ic_media_next, "Siguiente", pendingIntentSiguiente)
             .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Detener", pendingIntentDetener)
