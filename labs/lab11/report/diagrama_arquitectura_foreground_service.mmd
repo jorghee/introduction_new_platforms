@@ -1,0 +1,42 @@
+flowchart TD
+    subgraph UI ["Capa de Presentación (Jetpack Compose UI)"]
+        MA["MainActivity\n(Lifecycle & Permissions)"] --> AGS["AudioGuiaScreen\n(Scaffold & Estado)"]
+        PLO["ProcessLifecycleOwner\n(Detección Foreground / Background)"] -.->|LifecycleEventObserver| AGS
+        
+        AGS --> TEA["TarjetaEdificioActual\n(Progreso, Título, Estado)"]
+        AGS --> CP["ControlesPrincipales\n(Play/Pause, Detener, Siguiente)"]
+        AGS --> BCU["BotonContinuarUltimo\n(Reanudar persistido)"]
+        AGS --> LEC["ListaEdificiosCampus\n(Selección directa)"]
+        
+        VM["AudioGuiaViewModel\n(StateFlow Co-ordination)"] <-->|UiState / Acciones| AGS
+    end
+
+    subgraph SVC ["Capa de Servicio en Primer Plano (Foreground Service)"]
+        AGService["AudioGuiaService\n(Media Playback Service)"]
+        MP["MediaPlayer\n(Playback de audioguia_epis.mp3)"]
+        NM["NotificationManager\n(Canal: canal_audioguia_v2)"]
+        Notif["NotificationCompat.MediaStyle\n(Pausar | Siguiente | Detener)"]
+        
+        AGService -->|Control de audio| MP
+        AGService -->|startForeground / notify| NM
+        NM --> Notif
+    end
+
+    subgraph DATA ["Capa de Datos y Persistencia (Room Database)"]
+        REPO["AudioGuiaRepository"]
+        DAO["UltimoEdificioDao"]
+        ROOM["AppDatabase\n(audioguia_campus.db)"]
+        ENTITY[("Tabla ultimo_edificio\nSQLite Storage")]
+        
+        REPO --> DAO
+        DAO --> ROOM
+        ROOM --> ENTITY
+    end
+
+    %% Interacciones entre capas
+    VM -->|startForegroundService / Intent Actions| AGService
+    AGService -->|Actualiza StateFlow| VM
+    Notif -.->|PendingIntent.getService| AGService
+    
+    AGService -->|Auto-guardado al reproducir| REPO
+    REPO -->|Flow reactivo de último edificio| VM

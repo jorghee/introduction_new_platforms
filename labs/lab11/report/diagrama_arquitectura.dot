@@ -1,0 +1,91 @@
+digraph ForegroundServiceArchitecture {
+    rankdir=TB;
+    bgcolor="#ffffff";
+    fontname="Helvetica,Arial,sans-serif";
+    fontsize=12;
+    compound=true;
+    newrank=true;
+    nodesep=0.5;
+    ranksep=0.6;
+
+    node [fontname="Helvetica,Arial,sans-serif", fontsize=10, shape=box, style="filled,rounded", penwidth=1.5];
+    edge [fontname="Helvetica,Arial,sans-serif", fontsize=9, penwidth=1.2, color="#475569", fontcolor="#334155"];
+
+    subgraph cluster_presentation {
+        label="Capa de Presentación (Jetpack Compose UI)";
+        style="filled,rounded";
+        fillcolor="#f8fafc";
+        color="#cbd5e1";
+        fontsize=12;
+        fontcolor="#0f172a";
+
+        MainActivity [label="MainActivity\n(Lifecycle & Permissions\nPOST_NOTIFICATIONS)", fillcolor="#e0e7ff", color="#6366f1"];
+        AudioGuiaScreen [label="AudioGuiaScreen\n(Scaffold & Estado Reactivo)", fillcolor="#ede9fe", color="#8b5cf6"];
+        LifecycleObserver [label="ProcessLifecycleOwner\n(Detección Foreground/Background)", fillcolor="#fef3c7", color="#f59e0b", shape=note];
+        AudioGuiaViewModel [label="AudioGuiaViewModel\n(StateFlow Co-ordination)", fillcolor="#e0e7ff", color="#4f46e5"];
+
+        subgraph cluster_composables {
+            label="Componentes Modulares Compose";
+            style="dashed,rounded";
+            fillcolor="#ffffff";
+            color="#94a3b8";
+
+            TarjetaEdificio [label="TarjetaEdificioActual\n(Progreso, Título, Estado)", fillcolor="#f1f5f9", color="#64748b"];
+            ControlesPrincipales [label="ControlesPrincipales\n(Play/Pause, Detener, Siguiente)", fillcolor="#f1f5f9", color="#64748b"];
+            BotonContinuar [label="BotonContinuarUltimo\n(Reanudar edificio Room)", fillcolor="#f1f5f9", color="#64748b"];
+            ListaEdificios [label="ListaEdificiosCampus\n(Selección interactiva)", fillcolor="#f1f5f9", color="#64748b"];
+        }
+
+        MainActivity -> AudioGuiaScreen [label="setContent()"];
+        AudioGuiaScreen -> TarjetaEdificio;
+        AudioGuiaScreen -> ControlesPrincipales;
+        AudioGuiaScreen -> BotonContinuar;
+        AudioGuiaScreen -> ListaEdificios;
+        LifecycleObserver -> AudioGuiaScreen [style=dashed, label="ON_START / ON_STOP"];
+        AudioGuiaViewModel -> AudioGuiaScreen [label="UiState (StateFlow)", dir=both];
+    }
+
+    subgraph cluster_service {
+        label="Capa de Servicio en Primer Plano (Foreground Service)";
+        style="filled,rounded";
+        fillcolor="#f0fdf4";
+        color="#86efac";
+        fontsize=12;
+        fontcolor="#14532d";
+
+        AudioGuiaService [label="AudioGuiaService\n(Media Playback Service\nforegroundServiceType='mediaPlayback')", fillcolor="#dcfce7", color="#22c55e"];
+        MediaPlayer [label="MediaPlayer\n(Playback audio.mp3\nres/raw/audioguia_epis.mp3)", fillcolor="#bbf7d0", color="#16a34a"];
+        NotificationManager [label="NotificationManager\n(Canal: canal_audioguia_v2)", fillcolor="#dcfce7", color="#15803d"];
+        NotificationStyle [label="NotificationCompat.MediaStyle\nAcciones interactivas:\n[ Pausar / Reanudar | Siguiente | Detener ]", fillcolor="#fef9c3", color="#ca8a04", shape=folder];
+
+        AudioGuiaService -> MediaPlayer [label="start() / pause() / stop()"];
+        AudioGuiaService -> NotificationManager [label="startForeground(1, notif)"];
+        NotificationManager -> NotificationStyle [label="Despliegue activo"];
+    }
+
+    subgraph cluster_data {
+        label="Capa de Datos y Persistencia (Room Database)";
+        style="filled,rounded";
+        fillcolor="#eff6ff";
+        color="#93c5fd";
+        fontsize=12;
+        fontcolor="#1e3a8a";
+
+        AudioGuiaRepository [label="AudioGuiaRepository\n(Coordinador de datos & modelo)", fillcolor="#dbeafe", color="#3b82f6"];
+        UltimoEdificioDao [label="UltimoEdificioDao\n(Flow<UltimoEdificioEntity?>)", fillcolor="#bfdbfe", color="#2563eb"];
+        AppDatabase [label="AppDatabase\n(audioguia_campus.db)", fillcolor="#dbeafe", color="#1d4ed8"];
+        SQLiteStorage [label="Tabla SQLite 'ultimo_edificio'\n[ id | edificioId | nombre | categoria | timestamp ]", fillcolor="#e2e8f0", color="#475569", shape=cylinder];
+
+        AudioGuiaRepository -> UltimoEdificioDao [label="Llamadas DAO"];
+        UltimoEdificioDao -> AppDatabase [label="Consultas SQL"];
+        AppDatabase -> SQLiteStorage [label="Lectura / Escritura"];
+    }
+
+    // Interacciones entre módulos
+    AudioGuiaViewModel -> AudioGuiaService [color="#6366f1", penwidth=2, label="startForegroundService()\nIntent(ACCION_*)"];
+    AudioGuiaService -> AudioGuiaViewModel [color="#10b981", penwidth=2, style=dashed, label="StateFlow<AudioPlaybackState>"];
+    NotificationStyle -> AudioGuiaService [color="#d97706", penwidth=1.5, style=dotted, label="PendingIntent.getService()"];
+
+    AudioGuiaService -> AudioGuiaRepository [color="#2563eb", penwidth=1.5, label="guardarUltimoEdificio()\n(Auto-persistencia Ejercicio 3)"];
+    AudioGuiaRepository -> AudioGuiaViewModel [color="#2563eb", penwidth=1.5, style=dashed, label="Flow reactivo (observarUltimo)"];
+}
